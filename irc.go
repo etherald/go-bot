@@ -150,7 +150,7 @@ func (con *IRCConn) Identify(password string) bool {
                (strings.HasPrefix(evt.message, "You are already logged in") ||
                 strings.HasPrefix(evt.message, "You are now identified") ||
                 strings.HasPrefix(evt.message, "Invalid password"))
-    }, 10*1000000000);
+    }, 10*1000); //10 seconds in ms
     if evt == nil {
         return false;
     }

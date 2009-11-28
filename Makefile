@@ -13,5 +13,5 @@ main: main.${O}
 	${LD} -o main main.${O}
 
 main.${O}: ${GOFILES}
-	${GC} -o main.8 ${GOFILES}
+	${GC} -o main.${O} ${GOFILES}
 
