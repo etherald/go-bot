@@ -1,0 +1,62 @@
+Primarily, this bot is meant to be run by me (Gracenotes, Matt Gruen) in
+#go-nuts and #go-run on irc.freenode.net. If you'd like to use the bot, or
+parts of it, this might be useful to you. Other documentation is one the way.
+
+Sections: Making, File dependencies, Security, Controlling the bot,
+          Other compiler modifications, Other features, Formatting
+
+== Making ==
+Currently, all files are in the main package. The Makefile creates an
+executable, not a library which other Go programs can use. After all, go-bot is
+an application. The only packages required are those in the standard Go
+distribution, and possibly a 'safer' copy of the standard Go distribution in
+$GOROOT/safe, which will be used. This set-up is tentative, but tenable enough
+for actually running the bot in #go-nuts.
+
+== File dependencies ==
+To run the bot, there must be a Go root at $GOROOT/safe (this is set in
+run.go's GetDefaultConfig function, and can be changed), and a newline-
+separated list of modules to import in $GOROOT/go-bot/modules, set in
+AssignMain. My intention is that any module not in the list will not be
+imported. A modules 'mod' is imported if the string 'mod.' is found in
+the source code.
+
+== Security ==
+Note that os and io are importable; in my configuration at $GOROOT/safe, I
+have hackily altered the os package to disable 'dangerous' functionality.
+This involves only allowing file IO for fd <= 2 in os/file.go, no other
+filesystem or exec-related syscalls, etc. Note that io does not need to
+be altered, since it only uses os (the same is true for go/parser, path,
+bufio, and others).
+
+Disallow imports from os and all modules that use it if you have not done this,
+or want to fully allow all functionality.
+
+As an alternative, a ptrace/chroot environment with free imports might be both
+safer and more useful, but not any less complex to set up.
+
+== Controlling the bot ==
+Currently, only individuals with the IRC hostname *!person@wikipedia/Gracenotes
+may control the bot. This is obviously not acceptable if you're not me, so
+feel free to change this. Of course, nicks are spoofable and addresses may
+be shared, so a password and admin-tracking system might be required to get
+around this. As a controller, you can send "@go" and "@stop" to start and
+stop execution (off by default). You can also make the bot send arbitrary
+lines to the server with, for instance, ":PRIVMSG #channel :Message" in private
+message.
+
+== Other compiler modifications ==
+I've changed the compiler errors for both unused variables and unused imports
+into warnings. I think that keeping them as errors is more inconvenient in
+contrast to whatever true mistakes they might catch. It is possible the
+source code may contain such variables, e.g. errors.
+
+== Other features ==
+...are being added! Feel free to suggest enhancements or
+bugfixes to http://code.google.com/p/go-bot/issues/list
+
+== Formatting ==
+I don't run my code through gofmt, though this is a definite future
+possibility. The main difference stylistically is that I like to keep
+one-line blocks compact, particularly those containing merely a 'continue'
+or 'return'.
